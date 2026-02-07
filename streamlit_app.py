@@ -50,8 +50,15 @@ def get_data():
     options.add_argument("--headless")
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
+    options.add_argument("--disable-gpu")
     
-    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
+    # Point directly to the Chromium binary installed by packages.txt
+    options.binary_location = "/usr/bin/chromium"
+    
+    # On Streamlit Cloud, we don't use ChromeDriverManager. 
+    # The driver is already in the system path.
+    driver = webdriver.Chrome(options=options)
+    
     url = "https://script.google.com/macros/s/AKfycbysTgeywSBruJEElJ2Wm-FJaWW6ciHOsC3vhInFFRB2QoiBjTwr9BkCFaWWGwdtlEA4/exec"
     
     results = []
