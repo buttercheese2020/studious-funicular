@@ -34,13 +34,13 @@ st.markdown("""
     /* Large Text for Items */
     .item-card {
         background-color: #f0f2f6;
-        padding: 20px;
+        padding: 5px;
         border-radius: 10px;
-        margin-bottom: 12px;
-        border-left: 10px solid #FF4B4B;
+        margin-bottom: 5px;
+        //border-left: 10px solid #FF4B4B;
     }
-    .item-name { font-size: 28px; font-weight: 500; color: #31333F; }
-    .item-qty { font-size: 36px; font-weight: bold; color: #FF4B4B; float: right; }
+    .item-name { font-size: 22px; line-height: 1.2; font-weight: 500; color: #31333F; }
+    .item-qty { font-size: 22px; line-height: 1.2; font-weight: bold; color: #FF4B4B; float: right; }
     </style>
     """, unsafe_allow_html=True)
 
