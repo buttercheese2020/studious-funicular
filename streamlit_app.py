@@ -99,47 +99,46 @@ if 'data' in st.session_state:
     shop_list = list(df['Shop'].unique())
     total_shops = len(shop_list)
     
-    # 1. Initialize session state
+    # Initialize shop index if not present
     if 'shop_index' not in st.session_state:
         st.session_state.shop_index = 0
 
-    # 2. Callback functions to handle instant switching
-    def next_shop():
-        st.session_state.shop_index = (st.session_state.shop_index + 1) % total_shops
-
-    def prev_shop():
-        st.session_state.shop_index = (st.session_state.shop_index - 1) % total_shops
-
-    # 3. Progress Bar at the very top
-    progress_val = (st.session_state.shop_index + 1) / total_shops
-    st.progress(progress_val)
+    # --- 1. Progress Bar ---
+    # Progress is a float between 0.0 and 1.0
+    progress_value = (st.session_state.shop_index + 1) / total_shops
+    st.progress(progress_value)
     st.caption(f"進度：第 {st.session_state.shop_index + 1} 家 / 共 {total_shops} 家")
 
-    # 4. Navigation Row (Buttons + Selectbox)
-    # We use 'on_click' to trigger the functions above immediately
-    col1, col2, col3 = st.columns([1, 3, 1])
+    # --- 2. Navigation Row (Selectbox on Left, Buttons on Right) ---
+    # Col 1 is 3 parts wide, Col 2 and 3 are 1 part wide each
+    col_select, col_prev, col_next = st.columns([3, 1, 1])
 
-    with col1:
-        st.button("⬅️", on_click=prev_shop, use_container_width=True)
-
-    with col2:
-        # We use a key here to link the selectbox directly to session_state
+    with col_select:
+        # User can still manually pick a shop
         selected_shop = st.selectbox(
-            "選擇店鋪",
-            shop_list,
+            "選擇店鋪：", 
+            shop_list, 
             index=st.session_state.shop_index,
-            key="shop_selector",
             label_visibility="collapsed"
         )
-        # Update index if user manually picks from the dropdown
+        # Sync index if manually changed
         st.session_state.shop_index = shop_list.index(selected_shop)
 
-    with col3:
-        st.button("➡️", on_click=next_shop, use_container_width=True)
+    with col_prev:
+        if st.button("⬅️", use_container_width=True):
+            st.session_state.shop_index = (st.session_state.shop_index - 1) % total_shops
+            st.rerun() # Refresh to update progress bar and selectbox immediately
 
-    # --- Display Content ---
+    with col_next:
+        if st.button("➡️", use_container_width=True):
+            st.session_state.shop_index = (st.session_state.shop_index + 1) % total_shops
+            st.rerun()
+
+    # --- 3. Display Content ---
+    # Sticky Store Name
     st.markdown(f'<div class="sticky-header">{selected_shop}</div>', unsafe_allow_html=True)
     
+    # Show Items for Selected Shop
     items = df[df['Shop'] == selected_shop]
     for _, row in items.iterrows():
         st.markdown(f"""
