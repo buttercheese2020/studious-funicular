@@ -96,11 +96,37 @@ if st.button('🔄 更新最新數據', use_container_width=True):
 
 if 'data' in st.session_state:
     df = pd.DataFrame(st.session_state['data'])
-    shop_list = df['Shop'].unique()
+    shop_list = list(df['Shop'].unique())
     
-    # Navigation
-    selected_shop = st.selectbox("選擇店鋪：", shop_list)
-    
+    # Initialize shop index in session state if it doesn't exist
+    if 'shop_index' not in st.session_state:
+        st.session_state.shop_index = 0
+
+    # --- Navigation Row (Buttons + Selectbox) ---
+    # We use columns to put them on the same row. 
+    # [1, 3, 1] means the middle column is 3x wider than the buttons.
+    col1, col2, col3 = st.columns([1, 3, 1])
+
+    with col1:
+        if st.button("⬅️", use_container_width=True):
+            st.session_state.shop_index = (st.session_state.shop_index - 1) % len(shop_list)
+
+    with col2:
+        # The selectbox uses the session_state index to stay in sync
+        selected_shop = st.selectbox(
+            "選擇店鋪：", 
+            shop_list, 
+            index=st.session_state.shop_index,
+            label_visibility="collapsed" # Hides the label to save space on mobile
+        )
+        # Update index if user manually picks from the dropdown
+        st.session_state.shop_index = shop_list.index(selected_shop)
+
+    with col3:
+        if st.button("➡️", use_container_width=True):
+            st.session_state.shop_index = (st.session_state.shop_index + 1) % len(shop_list)
+
+    # --- Display Content ---
     # Display Sticky Store Name
     st.markdown(f'<div class="sticky-header">{selected_shop}</div>', unsafe_allow_html=True)
     
